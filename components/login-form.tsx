@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { LoginGoogle } from './login-google'
+import { LoginGoogle } from '@/components/login-google'
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
@@ -89,7 +89,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
-              <div>LGOING WITH GOOGLE HERE  </div>
               <LoginGoogle />
             </div>
             <div className="mt-4 text-center text-sm">

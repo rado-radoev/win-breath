@@ -1,45 +1,53 @@
-import { type Provider } from '@supabase/supabase-js';
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from './ui/button';
 
-export function LoginGoogle({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-    const handleLogin = async () => {
 
-        const supabase = createClient();
-        const provider = 'google' as Provider
+export function LoginGoogle() {
+  const router = useRouter()
+  const buttonRef = useRef<HTMLDivElement>(null)
 
-        try {
-            await supabase.auth.signInWithOAuth({
-                provider,
-                options: {
-                    redirectTo: `http://127.0.0.1:54321/auth/v1/callback`,
-                },
-            })
-        } catch (error: unknown) {
+  useEffect(() => {
+    const supabase = createClient()
 
-        }
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.onload = () => {
+      window.google.accounts.id.initialize({    
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+        callback: async (response: { credential: string }) => {
+          const { error } = await supabase.auth.signInWithIdToken({
+            provider: 'google',
+            token: response.credential,
+          })
+          if (!error) {
+            router.push('/protected')
+          }
+        },
+        use_fedcm_for_prompt: true,
+      })
+
+      if (buttonRef.current) {
+        window.google.accounts.id.renderButton(buttonRef.current, {
+          type: 'standard',
+          shape: 'pill',
+          theme: 'outline',
+          text: 'signin_with',
+          size: 'large',
+          logo_alignment: 'left',
+          width: 320,
+        })
+      }
     }
+    document.head.appendChild(script)
 
-    return (
-        <Button onClick={handleLogin}>
-            <div id="g_id_onload"
-                data-client_id="241681447406-7kgkapa91cisibqmb9frsshtbc1nrg03.apps.googleusercontent.com"
-                data-context="signin"
-                data-ux_mode="popup"
-                data-login_uri="http://localhost:3000"
-                data-auto_prompt="false">
-            </div>
+    return () => {
+      script.remove()
+    }
+  }, [router])
 
-            <div className="g_id_signin"
-                data-type="standard"
-                data-shape="pill"
-                data-theme="outline"
-                data-text="signin_with"
-                data-size="large"
-                data-logo_alignment="left">
-            </div>
-
-        </Button>
-
-    )
+  return <div ref={buttonRef} />
 }
