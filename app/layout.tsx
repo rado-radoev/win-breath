@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { BottomNav } from "@/components/custom/bottom-nav";
 
-const instrumentSansHeading = Instrument_Sans({subsets:['latin'],variable:'--font-heading'});
+const instrumentSansHeading = Instrument_Sans({ subsets: ['latin'], variable: '--font-heading' });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,11 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, instrumentSansHeading.variable)}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">{children}
+        {/* Mobile Bottom Navigation */}
+        <BottomNav />
+
+      </body>
     </html>
   );
 }
